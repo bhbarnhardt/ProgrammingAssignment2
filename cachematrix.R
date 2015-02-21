@@ -1,35 +1,36 @@
 ## Put comments here that give an overall description of what your
 ## functions do
 
+## Write a short comment describing this function
+
 ##COMMENT: This function creates a special "matrix" object that can cache its inverse.
 
 makeCacheMatrix <- function(x = matrix()) {
         m <- NULL  # An empty vetor m is created in the cache
-        set <- function(y) { #This anonymous function assigns y to vector x and NULL to m.
-                x <<- y
-                m <<- NULL
-        }
-        get <- function() x # This stores x as vector get.
-        setinverse <- function(solve) m <<- solve #This stores the inverse of the matrix in the cache as vector m.
-        getinverse<- function() m #This returns m.
-        list(set = set, get = get, #This lists the functions set, get, setinverse and getinverse, and identifies their environment.
-             setinverse = setinverse,
+        get <- function() x # This creates the function get(), which calls matrix x.
+        setinverse <- function(solve) m <<- solve # This function saves the inverse of matrix x to the cache.
+        getinverse<- function() m # This calls the inverse of matrix x from the cache.
+        list(get = get,               # This compiles functions get, setinverse and getinverse onto a single list.
+             setinverse = setinverse, # Each argument corresponds to the result of the function of the same name.
              getinverse = getinverse)
 }
 
+## Write a short comment describing this function
 
-## COMMENT: This function computes the inverse of the special "matrix" returned by makeCacheMatrix above. 
-## If the inverse has already been calculated (and the matrix has not changed), then the cachesolve should 
-## retrieve the inverse from the cache.
+## COMMENT: This function takes as input the 'special vector' f, which is actually a list of functions related to matrix x,
+## created by makeCacheMatrix(). This function either returns the inverse of the matrix x, or calculates an inverse
+## for matrix x which it returns. 
 
-cacheSolve <- function(x, ...) {
-        m <- x$getinverse()  # This checks the value of vector m in the cache
-        if(!is.null(m)) {    #If m is NOT null, the next lines of code are executed.
-                message("getting cached data") # The message "getting cached data" is returned.
+cacheSolve <- function(f, ...) {
+        m <- f$getinverse()  # This checks the value of vector m in the cach
+        if(!is.null(m)) {    # This states that if m is NOT null, the next lines of code should be executed.
+                message("Getting cached data...") # The message "getting cached data" is returned.
                 return(m) # m is returned from the cache.
+        } else {
+                message("Not in cache. Caluclating matrix inverse...")
         }
-        data <- x$get() #If the inverse is not already stored as vector m in the cache, it is computed from the matrix.
-        m <- solve(data, ...) #solve() inverts the matrix x, which has been saved to vector data. The results is stored in the cache as m.
-        x$setinverse(m) # The inverse is saved to the cache as m.
+        data <- (f$get()) # If the inverse is not already stored as vector m in the cache, matrix x is stored in vector 'data'.
+        m <- solve(data, ...) #solve() inverts matrix x, which has been stored in vector 'data'. The result is stored in the cache.
+        f$setinverse(m) # The inverse is saved to the cache as m.
         m # m is returned.
 }
